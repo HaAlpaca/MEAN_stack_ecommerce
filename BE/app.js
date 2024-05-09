@@ -6,19 +6,26 @@ const mongoose = require("mongoose");
 const cors = require('cors')
 require("dotenv/config"); // env config
 const api = process.env.API_URL; // URL
+const authJwt = require("./helpers/jwt");
+const errorHandler = require('./helpers/error-handler')
+
 const productsRouter = require("./routes/products");
 const categoriesRouter = require("./routes/categories");
+const usersRouter = require("./routes/users");
 
 app.use(cors())
 app.options('*',cors())
 
 // middleware
 app.use(bodyParser.json());
-app.use(morgan("tiny"));
+app.use(morgan("tiny")); // log http method
+app.use(authJwt()) // Protecting the API and Authentication JWT Middleware
+app.use(errorHandler) // error handler 
 
 // router FETCH API
 app.use(`${api}/products`, productsRouter);
 app.use(`${api}/categories`, categoriesRouter);
+app.use(`${api}/users`,usersRouter)
 
 mongoose
   .connect(process.env.CONNECTION_STRING)
